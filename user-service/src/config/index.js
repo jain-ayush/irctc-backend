@@ -30,6 +30,8 @@ const config = {
   ACCESS_TOKEN_EXP_SEC: Number(process.env.ACCESS_TOKEN_EXP_SEC || 900),
   REFRESH_TOKEN_EXP_SEC: Number(process.env.REFRESH_TOKEN_EXP_SEC || 604800),
   REDIS_USER_TTL: Number(process.env.REDIS_USER_TTL || 86400),
+  KAFKA_BROKER: process.env.KAFKA_BROKER,
+  KAFKA_CLIENT_ID: process.env.KAFKA_CLIENT_ID,
 };
 
 module.exports = config;

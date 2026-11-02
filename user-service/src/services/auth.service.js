@@ -9,6 +9,8 @@ const {redis} = require('../config/redis');
 const config = require("../config");
 
 const { generateAccessToken, generateRefreshToken, verifyRefreshToken } = require('../utils/auth')
+const notificationProducer = require("../kafka/producer/notification.producer")
+
 const sendOTP = async(firstName, lastName, email, password) => {
     const existingUser = await prisma.user.findUnique({
         where: {email}
@@ -23,12 +25,13 @@ const sendOTP = async(firstName, lastName, email, password) => {
     // await sendOtpEmail(email, otp)
     console.log('otp',otp)
     console.log('otpSessionId',otpSessionId)
+    await notificationProducer.sendOtpEmail(email, otp, (config.OTP_TTL) / 60);
+    logger.info(`OTP email queued for : ${email}`)
     return {otpSessionId}
 }
 
 const verifyOTP = async(otp, otpSessionId) => {
     const meta = await verifyOtp(otp, otpSessionId)
-    console.log('metaaaaaaaa', meta)
     if(meta === null){
           throw new BadRequestError("Invalid or expired OTP", "OTP_INVALID");
      }
@@ -43,6 +46,7 @@ const verifyOTP = async(otp, otpSessionId) => {
         }
         
     });
+    await notificationProducer.sendWelcomeEmail(meta.email,meta.firstName);
     return user
 }
 

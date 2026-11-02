@@ -16,7 +16,6 @@ const hmacFor = (email, otp) => {
 const generateAndStoreOtp = async(meta) => {
     const rateKey = `otp:rate:${meta.email}`;     // how many otp can be send in an hour
     const sentCount = parseInt(await redis.get(rateKey) || '0', 10)
-    logger.info('logger rateKey', {rateKey})
     console.log('console rateKey', rateKey)
     if(sentCount >= RATE_MAX) {
         throw new TooManyRequestsError(
